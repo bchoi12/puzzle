@@ -33,11 +33,64 @@ body {
     text-shadow: 1px 1px 1px #FFFFFF;
 }
 
+#button-starbird {
+    display: none;
+}
+
 .puzzle {
     height: 0;
     overflow-x: hidden;
     display: none;
     transition: height 1s ease-in-out, opacity 1s ease-in-out;
+
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.puzzle::-webkit-scrollbar {
+  display: none;
+}
+
+.puzzle-row {
+    margin: 1vw auto;
+    width: 100%;
+}
+
+.puzzle-box {
+    display: inline-block;
+    width: 18vw;
+    height: 13vw;
+    padding-top: 5vw;
+    border: 1px solid #FFFFFF;
+    text-align: center;
+    cursor: pointer;
+    margin: 0;
+    font-size: 3vw;
+}
+.puzzle-box-selected {
+    border: 1px solid #000;
+    border-radius: 1px;
+}
+.puzzle-box-solved.cat-1, #cat-1-name {
+    background-color: #5ccc74;
+}
+.puzzle-box-solved.cat-2, #cat-2-name {
+    background-color: #e6f25e;
+}
+.puzzle-box-solved.cat-3, #cat-3-name {
+    background-color: #5e7cf2;
+}
+.puzzle-box-solved.cat-4, #cat-4-name {
+    background-color: #c652f7;
+}
+.cat-name {
+    visibility: hidden;
+    padding: 1vw;
+}
+
+.puzzle-category {
+    font-size: 0.6em;
+    text-align: left;
 }
 
 .puzzle-clue {

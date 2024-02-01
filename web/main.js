@@ -4,7 +4,7 @@ var __webpack_exports__ = {};
   !*** ./ts/index.ts ***!
   \*********************/
 console.log("Hello world");
-let index = 2;
+let index = 4;
 let order = [
     "puzzle-welcome",
     "puzzle-car",
@@ -58,17 +58,64 @@ bobaButton.onclick = () => {
 };
 let starbirdButton = document.getElementById("button-starbird");
 starbirdButton.onclick = () => {
-    geo((position) => {
-        const lat = 37.37464758424886;
-        const lon = -122.05701383287769;
-        const dist = calcCrow(lat, lon, position.coords.latitude, position.coords.longitude);
-        let selfieClue = document.getElementById("clue-starbird");
-        selfieClue.textContent = Math.floor(dist) + "m away!";
-        if (dist <= 10) {
-            next();
-        }
-    });
+    next();
 };
+let boxes = document.getElementsByClassName("puzzle-box");
+let selected = new Set();
+let numSolved = 0;
+const selectedClass = "puzzle-box-selected";
+const solvedClass = "puzzle-box-solved";
+for (let i = 0; i < boxes.length; ++i) {
+    let box = boxes[i];
+    box.onclick = () => {
+        if (box.classList.contains(solvedClass)) {
+            return;
+        }
+        if (selected.has(box)) {
+            box.classList.remove(selectedClass);
+            selected.delete(box);
+            return;
+        }
+        if (selected.size >= 4) {
+            return;
+        }
+        box.classList.add(selectedClass);
+        selected.add(box);
+        if (selected.size === 4) {
+            let category = "";
+            for (let elm of selected) {
+                for (let j = 0; j < elm.classList.length; ++j) {
+                    if (elm.classList[j].includes("cat")) {
+                        category = elm.classList[j];
+                        break;
+                    }
+                }
+                break;
+            }
+            if (category.length > 0) {
+                let wrong = false;
+                for (let elm of selected) {
+                    if (!elm.classList.contains(category)) {
+                        wrong = true;
+                        break;
+                    }
+                }
+                if (!wrong) {
+                    numSolved++;
+                    selected.forEach((elm) => {
+                        elm.classList.add(solvedClass);
+                        elm.classList.remove(selectedClass);
+                    });
+                    selected.clear();
+                    document.getElementById(category + "-name").style.visibility = "visible";
+                }
+            }
+        }
+        if (numSolved >= 4) {
+            starbirdButton.style.display = "block";
+        }
+    };
+}
 function next() {
     if (index >= order.length - 1) {
         console.log("At the end.");
