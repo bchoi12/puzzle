@@ -1,7 +1,6 @@
 console.log("Hello world");
 
-let index = 4;
-let order = [
+const order = [
 	"puzzle-welcome",
 	"puzzle-car",
 	"puzzle-selfie",
@@ -12,9 +11,24 @@ let order = [
 	"puzzle-rockos",
 	"puzzle-costco",
 	"puzzle-base",
-	"puzzle-conrgats",
+	"puzzle-congrats",
 	"puzzle-true-end",
 ];
+
+const params = new URLSearchParams(window.location.search);
+let index = 0;
+if (params.has("v")) {
+	index = Math.floor(Number(params.get("v")));
+	if (index < 0) {
+		index = 0;
+	}
+	if (index >= order.length) {
+		index = order.length - 1;
+	}
+	if (index === order.length - 2) {
+		index++;
+	}
+}
 let current : HTMLElement = null;
 next();
 
@@ -40,7 +54,7 @@ selfieButton.onclick = () => {
 	  	let selfieClue = document.getElementById("clue-selfie");
 	  	selfieClue.textContent = Math.floor(dist) + "m away!";
 
-	  	if (dist <= 10) {
+	  	if (dist <= 30 + position.coords.accuracy) {
 	  		next();
 	  	}
 	});
@@ -125,21 +139,91 @@ for (let i = 0; i < boxes.length; ++i) {
 	}
 }
 
-function next() {
-	if (index >= order.length - 1) {
-		console.log("At the end.");
-		return;
-	}
+let apartmentButton = document.getElementById("button-apartment");
+apartmentButton.onclick = () => {
+	let apartmentText = <HTMLInputElement>document.getElementById("text-apartment");
 
+	let apartmentClue = document.getElementById("clue-apartment");
+	if (apartmentText.value.toLowerCase() === "magnolia") {
+		apartmentClue.textContent = "oooh yeah";
+		next();
+	} else {
+		apartmentClue.textContent = "not quite";
+	}
+}
+
+let waffleButton = document.getElementById("button-waffle");
+waffleButton.onclick = () => {
+	geo((position : GeolocationPosition) => {
+	  	const lat = 37.353981;
+	  	const lon = -121.954642;
+	  	const dist = calcCrow(lat, lon, position.coords.latitude, position.coords.longitude);
+
+	  	let waffleClue = document.getElementById("clue-waffle");
+	  	waffleClue.textContent = Math.floor(dist) + "m away!";
+
+	  	if (dist <= 30 + position.coords.accuracy) {
+	  		next();
+	  	}
+	});
+}
+
+let rockosButton = document.getElementById("button-rockos");
+rockosButton.onclick = () => {
+	geo((position : GeolocationPosition) => {
+	  	const lat = 37.34561728311603;
+	  	const lon = -121.93748772707056;
+	  	const dist = calcCrow(lat, lon, position.coords.latitude, position.coords.longitude);
+
+	  	let rockosClue = document.getElementById("clue-rockos");
+	  	rockosClue.textContent = Math.floor(dist) + "m away!";
+
+	  	if (dist <= 30 + position.coords.accuracy) {
+	  		next();
+	  	}
+	});
+}
+
+let costcoButton = document.getElementById("button-costco");
+costcoButton.onclick = () => {
+	next();
+}
+
+let baseButton = document.getElementById("button-base");
+baseButton.onclick = () => {
+	geo((position : GeolocationPosition) => {
+	  	const lat = 37.415431853136795;
+	  	const lon = -121.95672258207551;
+	  	const dist = calcCrow(lat, lon, position.coords.latitude, position.coords.longitude);
+
+	  	let baseClue = document.getElementById("clue-base");
+	  	baseClue.textContent = Math.floor(dist) + "m away!";
+
+	  	if (dist <= 100 + position.coords.accuracy) {
+	  		next();
+	  	}
+	});
+}
+
+
+function next() {
 	console.log("Loading...");
 
-	if (current !== null) {
+	if (current !== null && index < order.length - 1) {
 		current.style.height = "0%";
 		current.style.opacity = "0";
+		index++;
+
+		window.history.replaceState(null, null, "?v=" + index);
 	}
-	index++;
-	if (index >= 0) {
+	if (index >= 0 && index < order.length) {
 		current = document.getElementById(order[index]);
+
+		if (current === null) {
+			console.error("Null for", order[index], index);
+			return;
+		}
+
 		current.style.display = "block";
 		current.style.height = "100%";
 	}
@@ -148,6 +232,7 @@ function next() {
 function geo(cb : (pos : GeolocationPosition) => void) : void {
 	if (navigator.geolocation) {
 	  navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+	  	console.log(position);
 	  	cb(position);
 	  }, () => { console.error("GPS error"); },
 	  { maximumAge: 10000, timeout: 5000, enableHighAccuracy: true });
